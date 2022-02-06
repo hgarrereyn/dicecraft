@@ -27,7 +27,7 @@ public:
 
     World() {}
 
-    void setBlock(int x, int y, int z, Block block, BlockDir dir = BlockDir::NORTH) {
+    void setBlock(int x, int y, int z, Block block, BlockDir dir = BlockDir::NORTH, uint32_t state = 0) {
         ChunkCoord coord = ChunkCoord::FromWorld(x, y);
 
         if (chunks.count(coord) == 0) {
@@ -36,7 +36,7 @@ public:
 
         int cx_off = x - (coord.x * CHUNK_WIDTH);
         int cy_off = y - (coord.y * CHUNK_WIDTH);
-        chunks[coord].setBlock(cx_off, cy_off, z, block, dir);
+        chunks[coord].setBlock(cx_off, cy_off, z, block, dir, state);
 
         if (cx_off == 0) {
             ChunkCoord back(coord.x+1, coord.y);
@@ -56,13 +56,13 @@ public:
         }
     }
 
-    void setPulse(int x, int y, int z, uint8_t val) {
+    void setPulse(int x, int y, int z, uint32_t val, BlockDir dir) {
         ChunkCoord coord = ChunkCoord::FromWorld(x, y);
         if (chunks.count(coord) == 0) return;
         
         int cx_off = x - (coord.x * CHUNK_WIDTH);
         int cy_off = y - (coord.y * CHUNK_WIDTH);
-        chunks[coord].setPulse(cx_off, cy_off, z, val);
+        chunks[coord].setPulse(cx_off, cy_off, z, val, dir);
     }
 
     void interact(int x, int y, int z) {

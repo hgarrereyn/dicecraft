@@ -21,12 +21,21 @@ Block Chunk::getNeighbor(int x, int y, int z) {
     return world->getBlock(x + (coord.x * CHUNK_WIDTH), y + (coord.y * CHUNK_WIDTH), z);
 }
 
-void Chunk::setNeighborPulse(int x, int y, int z, uint8_t val) {
+void Chunk::setNeighborPulse(int x, int y, int z, uint32_t val, BlockDir dir) {
     if (x >= 0 && x < CHUNK_WIDTH && y >= 0 && y < CHUNK_WIDTH) {
-        setPulse(x, y, z, val);
+        setPulse(x, y, z, val, dir);
     }
     if (world == nullptr) return;
-    world->setPulse(x + (coord.x * CHUNK_WIDTH), y + (coord.y * CHUNK_WIDTH), z, val);
+    world->setPulse(x + (coord.x * CHUNK_WIDTH), y + (coord.y * CHUNK_WIDTH), z, val, dir);
+}
+
+void Chunk::offsetPulse(int x, int y, int z, BlockDir dir, uint32_t val) {
+    switch (dir) {
+        case NORTH: setNeighborPulse(x+1, y, z, val, dir); break;
+        case SOUTH: setNeighborPulse(x-1, y, z, val, dir); break;
+        case EAST: setNeighborPulse(x, y-1, z, val, dir); break;
+        case WEST: setNeighborPulse(x, y+1, z, val, dir); break;
+    }
 }
 
 // sides:
@@ -637,13 +646,13 @@ void Chunk::tick(int currTick) {
         blocks[z][y][x].state = it->second->getState();
 
         bool pulse[4];
-        uint8_t val[4];
+        uint32_t val[4];
         it->second->getOutput(pulse, val);
 
-        if (pulse[0]) setNeighborPulse(x+1, y, z, val[0]);
-        if (pulse[1]) setNeighborPulse(x-1, y, z, val[1]);
-        if (pulse[2]) setNeighborPulse(x, y+1, z, val[2]);
-        if (pulse[3]) setNeighborPulse(x, y-1, z, val[3]);
+        if (pulse[S_FRONT]) offsetPulse(x, y, z, RelativeToGlobal(blocks[z][y][x].dir, S_FRONT), val[S_FRONT]);
+        if (pulse[S_BACK]) offsetPulse(x, y, z, RelativeToGlobal(blocks[z][y][x].dir, S_BACK), val[S_BACK]);
+        if (pulse[S_LEFT]) offsetPulse(x, y, z, RelativeToGlobal(blocks[z][y][x].dir, S_LEFT), val[S_LEFT]);
+        if (pulse[S_RIGHT]) offsetPulse(x, y, z, RelativeToGlobal(blocks[z][y][x].dir, S_RIGHT), val[S_RIGHT]);
 
         it++;
     }
@@ -656,12 +665,26 @@ void Chunk::tick(int currTick) {
                 BlockState block = blocks[z][y][x];
                 if (block.type != DICESTONE) continue;
 
-                uint8_t val = ds_val[z][y][x];
+                uint32_t val = ds_val[z][y][x];
                 if (ds_pulse[z][y][x]) {
-                    setNeighborPulse(x+1, y, z, val);
-                    setNeighborPulse(x-1, y, z, val);
-                    setNeighborPulse(x, y+1, z, val);
-                    setNeighborPulse(x, y-1, z, val);
+                    setNeighborPulse(x+1, y, z, val, BlockDir::NORTH);
+                    setNeighborPulse(x-1, y, z, val, BlockDir::SOUTH);
+                    setNeighborPulse(x, y+1, z, val, BlockDir::WEST);
+                    setNeighborPulse(x, y-1, z, val, BlockDir::EAST);
+
+                    if (blocks[z+1][y][x].type == Block::EMPTY) {
+                        setNeighborPulse(x+1, y, z+1, val, BlockDir::NORTH);
+                        setNeighborPulse(x-1, y, z+1, val, BlockDir::SOUTH);
+                        setNeighborPulse(x, y+1, z+1, val, BlockDir::WEST);
+                        setNeighborPulse(x, y-1, z+1, val, BlockDir::EAST);
+                    }
+
+                    if (z > 0) {
+                        if (getNeighbor(x+1,y,z) == Block::EMPTY) setNeighborPulse(x+1, y, z-1, val, BlockDir::NORTH);
+                        if (getNeighbor(x-1,y,z) == Block::EMPTY) setNeighborPulse(x-1, y, z-1, val, BlockDir::SOUTH);
+                        if (getNeighbor(x,y+1,z) == Block::EMPTY) setNeighborPulse(x, y+1, z-1, val, BlockDir::WEST);
+                        if (getNeighbor(x,y-1,z) == Block::EMPTY) setNeighborPulse(x, y-1, z-1, val, BlockDir::EAST);
+                    }
                 }
 
             }

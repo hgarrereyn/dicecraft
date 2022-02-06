@@ -36,7 +36,7 @@ void Saver::save(const char *filename, World *world) {
                 /* y */ it->first.y
             };
             fwrite(&chunk_info, sizeof(chunk_info), 1, f);
-            fwrite(it->second.refBlocks(), sizeof(Block), CHUNK_WIDTH * CHUNK_WIDTH * CHUNK_HEIGHT, f);
+            fwrite(it->second.refBlocks(), sizeof(BlockState), CHUNK_WIDTH * CHUNK_WIDTH * CHUNK_HEIGHT, f);
         }
         it++;
     }
@@ -71,7 +71,7 @@ void Saver::load(const char *filename, World *world) {
 
         Chunk ck(coord, true);
         ck.setDirty();
-        fread(ck.refBlocks(), sizeof(Block), CHUNK_WIDTH * CHUNK_WIDTH * CHUNK_HEIGHT, f);
+        fread(ck.refBlocks(), sizeof(BlockState), CHUNK_WIDTH * CHUNK_WIDTH * CHUNK_HEIGHT, f);
         ck.resetComputers();
         world->setChunk(coord, ck);
     }

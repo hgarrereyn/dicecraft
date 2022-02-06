@@ -52,8 +52,8 @@ void World::setup() {
     selection = new Selection();
     overlay = new Overlay();
 
-    tilemap = new Tilemap("../res/tilemap.png");
-    // tilemap = new Tilemap(emb_tilemap::data, 256, 256);
+    // tilemap = new Tilemap("../res/tilemap.png");
+    tilemap = new Tilemap(emb_tilemap::data, 256, 256);
 }
 
 void World::render() {
@@ -175,8 +175,8 @@ void World::update(GLFWwindow *window, float delta, bool has_focus) {
             float dy = (player.pos.y - ((float)sel_empty.y + 0.5));
 
             if (abs(dx) > abs(dy)) {
-                if (dx > 0) place_dir = BlockDir::SOUTH;
-                else place_dir = BlockDir::NORTH;
+                if (dx > 0) place_dir = BlockDir::NORTH;
+                else place_dir = BlockDir::SOUTH;
             } else {
                 if (dy > 0) place_dir = BlockDir::WEST;
                 else place_dir = BlockDir::EAST;
@@ -211,8 +211,18 @@ void World::key_input(GLFWwindow* window, int key, int scancode, int action, int
             case GLFW_KEY_4: place_block = Block::DICESTONE; return;
 
             case GLFW_KEY_5: place_block = Block::SPINNER; return;
-            case GLFW_KEY_6: place_block = Block::DIODE; return;
+            case GLFW_KEY_6: place_block = Block::BUMPER; return;
             case GLFW_KEY_7: place_block = Block::TERM; return;
+            case GLFW_KEY_8: place_block = Block::BUTTON; return;
+            case GLFW_KEY_9: place_block = Block::SIGNAL; return;
+            case GLFW_KEY_0: place_block = Block::LOCK; return;
+
+            case GLFW_KEY_T: place_block = Block::JUNCTION; return;
+            case GLFW_KEY_Y: place_block = Block::SHIFTER; return;
+            case GLFW_KEY_U: place_block = Block::LETTERS; return;
+            case GLFW_KEY_I: place_block = Block::MUT; return;
+            case GLFW_KEY_O: place_block = Block::FLAG; return;
+            case GLFW_KEY_R: place_block = Block::SLOT; return;
 
             case GLFW_KEY_F: player.toggleFlying(); return;
             
@@ -227,29 +237,16 @@ void World::mouse_input(GLFWwindow* window, double xpos, double ypos) {
 
 void World::tick() {
     currTick += 1;
-    
-    // Update nearby chunks.
-    ChunkCoord pcoord = ChunkCoord::FromWorld((int)player.pos.x, (int)player.pos.y);
-    for (int x = -CHUNK_VIZ_RADIUS; x <= CHUNK_VIZ_RADIUS; ++x) {
-        for (int y = -CHUNK_VIZ_RADIUS; y <= CHUNK_VIZ_RADIUS; ++y) {
-            ChunkCoord coord = ChunkCoord(pcoord.x + x, pcoord.y + y);
-            if (chunks.count(coord) == 0) {
-                continue;
-            }
 
-            chunks[coord].tick(currTick);
-        }
+    auto it = chunks.begin();
+    while (it != chunks.end()) {
+        it->second.tick(currTick);
+        it++;
     }
 
-    // Propogate cooldown.
-    for (int x = -CHUNK_VIZ_RADIUS; x <= CHUNK_VIZ_RADIUS; ++x) {
-        for (int y = -CHUNK_VIZ_RADIUS; y <= CHUNK_VIZ_RADIUS; ++y) {
-            ChunkCoord coord = ChunkCoord(pcoord.x + x, pcoord.y + y);
-            if (chunks.count(coord) == 0) {
-                continue;
-            }
-
-            chunks[coord].postTick();
-        }
+    it = chunks.begin();
+    while (it != chunks.end()) {
+        it->second.postTick();
+        it++;
     }
 }

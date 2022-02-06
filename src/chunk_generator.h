@@ -21,7 +21,7 @@ public:
                 int height = (fac * 10) + 10;
 
                 for (int z = 0; z < min(height, CHUNK_HEIGHT); ++z) {
-                    ck.setBlock(x, y, z, Block::DICE, BlockDir::NORTH, false);
+                    ck.setBlock(x, y, z, Block::DICE, BlockDir::NORTH, 0, false);
                 }
             }
         }

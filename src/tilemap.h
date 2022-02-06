@@ -55,32 +55,32 @@ public:
         switch (worldFace) {
             case TOP: face = TOP; break;
             case BOTTOM: face = BOTTOM; break;
-            case FRONT: switch (block.dir) {
-                case NORTH: face = FRONT; break;
-                case SOUTH: face = BACK; break;
-                case EAST: face = RIGHT; break;
-                case WEST: face = LEFT; break;
+            case BlockFace::FRONT: switch (block.dir) {
+                case NORTH: face = BlockFace::BACK; break;
+                case SOUTH: face = BlockFace::FRONT; break;
+                case EAST: face = BlockFace::LEFT; break;
+                case WEST: face = BlockFace::RIGHT; break;
             }
             break;
-            case BACK: switch (block.dir) {
-                case NORTH: face = BACK; break;
-                case SOUTH: face = FRONT; break;
-                case EAST: face = LEFT; break;
-                case WEST: face = RIGHT; break;
+            case BlockFace::BACK: switch (block.dir) {
+                case NORTH: face = BlockFace::FRONT; break;
+                case SOUTH: face = BlockFace::BACK; break;
+                case EAST: face = BlockFace::RIGHT; break;
+                case WEST: face = BlockFace::LEFT; break;
             }
             break;
-            case LEFT: switch (block.dir) {
-                case NORTH: face = LEFT; break;
-                case SOUTH: face = RIGHT; break;
-                case EAST: face = BACK; break;
-                case WEST: face = FRONT; break;
+            case BlockFace::LEFT: switch (block.dir) {
+                case NORTH: face = BlockFace::LEFT; break;
+                case SOUTH: face = BlockFace::RIGHT; break;
+                case EAST: face = BlockFace::BACK; break;
+                case WEST: face = BlockFace::FRONT; break;
             }
             break;
-            case RIGHT: switch (block.dir) {
-                case NORTH: face = RIGHT; break;
-                case SOUTH: face = LEFT; break;
-                case EAST: face = FRONT; break;
-                case WEST: face = BACK; break;
+            case BlockFace::RIGHT: switch (block.dir) {
+                case NORTH: face = BlockFace::RIGHT; break;
+                case SOUTH: face = BlockFace::LEFT; break;
+                case EAST: face = BlockFace::FRONT; break;
+                case WEST: face = BlockFace::BACK; break;
             }
             break;
         }
@@ -109,17 +109,9 @@ public:
                 case BlockFace::LEFT: return TILE(19);
             }
 
-            case Block::DIODE: switch (face) {
-                case BlockFace::TOP: return TILE(21);
-                case BlockFace::FRONT: switch (tick % 6) {
-                    case 0: return TILE(48);
-                    case 1: return TILE(49);
-                    case 2: return TILE(50);
-                    case 3: 
-                    case 4:
-                    case 5:
-                        return TILE(51);
-                };
+            case Block::BUMPER: switch (face) {
+                case BlockFace::TOP: return TILE(48 + (tick % 4));
+                case BlockFace::FRONT: return TILE(19);
                 case BlockFace::RIGHT: switch (tick % 2) {
                     case 0: return TILE(17);
                     case 1: return TILE(18);
@@ -132,6 +124,114 @@ public:
             case Block::TERM: switch (face) {
                 case BlockFace::TOP: return TILE(21);
                 case BlockFace::FRONT: return TILE((64 + (block.state % 16)));
+                case BlockFace::RIGHT: switch (tick % 2) {
+                    case 0: return TILE(17);
+                    case 1: return TILE(18);
+                }
+                case BlockFace::BOTTOM: return TILE(21);
+                case BlockFace::BACK: return TILE(20);
+                case BlockFace::LEFT: return TILE(19);
+            }
+
+            case Block::BUTTON: switch (face) {
+                case BlockFace::TOP: return TILE(21);
+                case BlockFace::FRONT: return TILE((80 + (block.state % 2)));
+                case BlockFace::RIGHT: switch (tick % 2) {
+                    case 0: return TILE(17);
+                    case 1: return TILE(18);
+                }
+                case BlockFace::BOTTOM: return TILE(21);
+                case BlockFace::BACK: return TILE(20);
+                case BlockFace::LEFT: return TILE(19);
+            }
+
+            case Block::FLAG: switch (face) {
+                case BlockFace::TOP: return TILE(21);
+                case BlockFace::FRONT: return TILE((37 + (block.state % 2)));
+                case BlockFace::RIGHT: switch (tick % 2) {
+                    case 0: return TILE(17);
+                    case 1: return TILE(18);
+                }
+                case BlockFace::BOTTOM: return TILE(21);
+                case BlockFace::BACK: return TILE(20);
+                case BlockFace::LEFT: return TILE(19);
+            }
+
+            case Block::LETTERS: switch (face) {
+                case BlockFace::TOP: return TILE(21);
+                case BlockFace::FRONT: return TILE((112 + (block.state % 8)));
+                case BlockFace::RIGHT: switch (tick % 2) {
+                    case 0: return TILE(17);
+                    case 1: return TILE(18);
+                }
+                case BlockFace::BOTTOM: return TILE(21);
+                case BlockFace::BACK: return TILE(20);
+                case BlockFace::LEFT: return TILE(19);
+            }
+
+            case Block::SIGNAL: switch (face) {
+                case BlockFace::TOP: return TILE(21);
+                case BlockFace::FRONT: return TILE((82 + (block.state % 2)));
+                case BlockFace::RIGHT: switch (tick % 2) {
+                    case 0: return TILE(17);
+                    case 1: return TILE(18);
+                }
+                case BlockFace::BOTTOM: return TILE(21);
+                case BlockFace::BACK: return TILE(20);
+                case BlockFace::LEFT: return TILE(19);
+            }
+
+            case Block::LOCK: switch (face) {
+                case BlockFace::TOP: return TILE(21);
+                case BlockFace::FRONT: return TILE((84 + (block.state % 2)));
+                case BlockFace::RIGHT: switch (tick % 2) {
+                    case 0: return TILE(17);
+                    case 1: return TILE(18);
+                }
+                case BlockFace::BOTTOM: return TILE(21);
+                case BlockFace::BACK: return TILE(20);
+                case BlockFace::LEFT: return TILE(19);
+            }
+
+            case Block::SLOT: switch (face) {
+                case BlockFace::TOP: return TILE(21);
+                case BlockFace::FRONT: return TILE((96 + (block.state % 2)));
+                case BlockFace::RIGHT: switch (tick % 2) {
+                    case 0: return TILE(17);
+                    case 1: return TILE(18);
+                }
+                case BlockFace::BOTTOM: return TILE(21);
+                case BlockFace::BACK: return TILE(20);
+                case BlockFace::LEFT: return TILE(19);
+            }
+
+            case Block::MUT: switch (face) {
+                case BlockFace::TOP: return TILE(21);
+                case BlockFace::FRONT: return TILE((52 + (block.state % 2)));
+                case BlockFace::RIGHT: switch (tick % 2) {
+                    case 0: return TILE(17);
+                    case 1: return TILE(18);
+                }
+                case BlockFace::BOTTOM: return TILE(21);
+                case BlockFace::BACK: return TILE(20);
+                case BlockFace::LEFT: return TILE(19);
+            }
+
+            case Block::JUNCTION: switch (face) {
+                case BlockFace::TOP: return TILE(21);
+                case BlockFace::FRONT: return TILE((54 + (block.state % 2)));
+                case BlockFace::RIGHT: switch (tick % 2) {
+                    case 0: return TILE(17);
+                    case 1: return TILE(18);
+                }
+                case BlockFace::BOTTOM: return TILE(21);
+                case BlockFace::BACK: return TILE(20);
+                case BlockFace::LEFT: return TILE(19);
+            }
+
+            case Block::SHIFTER: switch (face) {
+                case BlockFace::TOP: return TILE(21);
+                case BlockFace::FRONT: return TILE((98 + (block.state % 2)));
                 case BlockFace::RIGHT: switch (tick % 2) {
                     case 0: return TILE(17);
                     case 1: return TILE(18);

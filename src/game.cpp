@@ -1,7 +1,7 @@
 
-#ifndef _WIN32
+// #ifndef _WIN32
 #include <sys/stat.h>
-#endif
+// #endif
 
 #include <iostream>
 
@@ -25,6 +25,7 @@ void init() {
     }
 
     window = glfwCreateWindow(800, 600, "DiceCraft", NULL, NULL);
+    glfwSetCursorPos(window, (double)800 / 2, (double)600 / 2);
     if (!window) {
         glfwTerminate();
         cerr << "Could not create window." << endl;
@@ -66,6 +67,10 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
 
 void window_size_callback(GLFWwindow* window, int width, int height) {
     global_world->set_window_size(width, height);
+    glViewport(0, 0, width, height);
+#ifndef _WIN32
+    glfwSetCursorPos(window, (double)width / 2, (double)height / 2);
+#endif
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
@@ -80,14 +85,6 @@ int main(int argc, char **argv) {
 
     global_world = new World();
 
-    for (int x = -30; x <= 30; ++x) {
-        for (int y = -30; y < 30; ++y) {
-            for (int z = 0; z < 10; ++z) {
-                global_world->setBlock(x,y,z,Block::METAL);
-            }
-        }
-    }
-
     global_world->player.pos = glm::vec3(0,0,15);
     global_world->player.dir.y = -0.1;
     global_world->player.updateTarget();
@@ -96,14 +93,17 @@ int main(int argc, char **argv) {
     if (argc == 2) {
         saveFile = argv[1];
 
-#ifndef _WIN32
+#ifdef _WIN32
+        struct _stat buf;
+        if (_stat(saveFile, &buf) == 0) {
+#else
         struct stat buf;
         if (stat(saveFile, &buf) == 0) {
+#endif
             cout << "[*] Loading from save file: " << saveFile << endl;
             Saver::load(saveFile, global_world);
         } else {
             cout << "[*] Save file doesn't exist, starting new world..." << endl;
-#endif
         }
     }
 
